@@ -1,0 +1,239 @@
+{% extends "base.html" %} {% block pageContent %}
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Kasir</h4>
+        </div>
+    </div>
+</div>
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <form action="" id="kasir-form">
+            <fieldset>
+                <legend>Tambahkan Barang</legend>
+                <div class="row align-items-end">
+                    <div class="col-lg-5 col-md-5 col-sm-12">
+                        <div class="form-group mb-3">
+                            <label for="barang-id">Pilih Barang</label>
+                            <select id="barang-id" class="form-select form-select-sm">
+                                <option value="" disabled selected></option>
+                                {% for bar in barang %}
+                                    <option value="{{ bar.pk }}">{{ bar }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-5 col-md-12">
+                        <div class="form-group mb-3">
+                            <label for="barang-qty">Jumlah</label>
+                            <input type="number" class="form-control form-control-sm text-center" step="any" id="barang-qty" value="1">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-2 col-md-12">
+                        <div class="form-group mb-3">
+                            <button class="btn btn-light btn-sm bg-gradient border rounded-0 text-start" type="button" id="add_item"><i class="mdi mdi-plus"></i> Tambah Item</button>
+                        </div>
+                    </div>
+
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="d-flex w-100" id="kasir-field">
+                    <div class="col-8 bg-gradient bg-light border h-100">
+                        <table class="table table-bordered">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="15%">
+                                <col width="40%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                                <tr class="bg-dark bg-gradient bg-opacity-50 text-light">
+                                    <th class="py-1 px-2 text-center  text-light"></th>
+                                    <th class="py-1 px-2 text-center  text-light">Jumlah</th>
+                                    <th class="py-1 px-2 text-center  text-light">Barang</th>
+                                    <th class="py-1 px-2 text-center  text-light">Harga</th>
+                                    <th class="py-1 px-2 text-center  text-light">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-4 bg-gradient bg-dark bg-opacity-50 border h-100">
+                        <div class="col-12 py-4 px-2">
+                            <dl>
+                                <dt class="h4 fw-bold text-light">Total Harga</dt>
+                                <dd class="text-end py-1 px-2 rounded-0 bg-light">
+                                    <input type="hidden" name="final_total" value="0">
+                                    <input type="hidden" name="tendered_amount" value="0">
+                                    <input type="hidden" name="amount_change" value="0">
+                                    <input type="hidden" name="final_total" value="0">
+                                    <input type="hidden" name="final_total" value="0">
+                                    <span class="h3 fw-bold" id="final_total">0.00</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="col-md-12 text-end">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="check_out"><i class="mdi mdi-save"></i> Checkout</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<noscript id="item-clone">
+    <tr>
+        <td class="px-2 py-1 text-center">
+            <button class="btn btn-sm btn-outline-danger rounded-0 rem-item" type="button"><i class="mdi mdi-close"></i></button>
+        </td>
+        <td class="px-2 py-1">
+            <input type="hidden" name="barang_id[]">
+            <input type="hidden" name="price[]">
+            <input type="number" name="qty[]" min="0" class="form-control form-control-sm rounded-0 text-center">
+        </td>
+        <td class="px-2 py-1 barang_name text-start"></td>
+        <td class="px-2 py-1 barang_price text-end"></td>
+        <td class="px-2 py-1 barang_total text-end"></td>
+    </tr>
+</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    var bar_json = '{{ bar_json }}'
+    if (bar_json == "" || bar_json == "{}") {
+        bar_json = {}
+    } else {
+        bar_json = bar_json.replaceAll('&quot;', '"')
+        bar_json = $.parseJSON(bar_json)
+    }
+    var bar_arr = {}
+    if (Object.keys(bar_json).length > 0) {
+        Object.keys(bar_json).map(k => {
+            bar_arr[bar_json[k].id] = bar_json[k]
+        })
+    }
+
+    function calc() {
+        var sub_total = 0;
+        var final_total = 0;
+        $('#kasir-field table tbody tr').each(function() {
+            price = $(this).find('[name="price[]"]').val()
+            qty = $(this).find('[name="qty[]"]').val()
+            qty = qty > 0 ? qty : 0
+            total = parseFloat(price) * parseFloat(qty)
+            $(this).find('.barang_total').text(parseFloat(total).toLocaleString('en-US'))
+            sub_total += parseFloat(total)
+        })
+        $('#final_total').text(parseFloat(sub_total).toLocaleString('en-US'))
+        $('[name="final_total"]').val(parseFloat(sub_total))
+        $('#sub_total').text(parseFloat(sub_total).toLocaleString('en-US'))
+        $('[name="sub_total"]').val(parseFloat(sub_total))
+        
+
+    }
+    $(function() {
+        $('#barang-id').select2({
+            placeholder: "Silahkan pilih barang",
+            width: '100%'
+        })
+        $('#add_item').click(function() {
+            var id = $('#barang-id').val()
+            var qty = $('#barang-qty').val()
+            console.log(id, qty)
+            if (id == '' || qty == '' || id == null || qty == null) {
+                alert("Barang dan jumlah diperlukan!")
+                return false
+            }
+            if (!!bar_arr[id]) {
+                if ($('#kasir-field table tbody input[name="barang_id[]"][value="' + id + '"]').length > 0) {
+                    alert('Item sudah ada di daftar!')
+                    return false;
+                }
+                data = bar_arr[id]
+                var tr = $($('noscript#item-clone').html()).clone()
+                tr.find('[name="qty[]"]').val(qty)
+                tr.find('[name="barang_id[]"]').val(id)
+                tr.find('[name="price[]"]').val(data.price)
+                tr.find('.barang_name').text(data.name)
+                tr.find('.barang_price').text(parseFloat(data.price).toLocaleString('en-US'))
+                tr.find('.barang_total').text(parseFloat(data.price * qty).toLocaleString('en-US'))
+                $('#kasir-field table tbody').append(tr)
+                $('#barang-id').val('').trigger('change')
+                $('#barang-qty').val(1)
+                calc()
+                tr.find('[name="qty[]"]').on('klik panah atas atau bawah', function() {
+                    calc()
+                })
+                tr.find('.rem-item').click(function() {
+                    if (confirm("Yakin ingin menghapus " + data.name + " daftar?") == true) {
+                        tr.remove()
+                        calc()
+                    }
+                })
+            } else {
+                alert("Barang tidak terdefinisi");
+            }
+        })
+        $('#check_out').click(function() {
+            if ($('#kasir-field table tbody tr').length <= 0) {
+                alert("Pilih barang setidaknya 1!")
+                return false;
+            }
+            uni_modal("Checkout", "{% url 'checkout-modal' %}?final_total=" + $('[name="final_total"]').val())
+        })
+        $('#kasir-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'save-kasir' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg")
+                            // location.reload()
+                        uni_modal("Receipt", "{% url 'receipt-modal' %}?id=" + resp.penjualan_id)
+                        $('#uni_modal').on('hide.bs.modal', function() {
+                            location.reload()
+                        })
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>
+{% endblock ScriptBlock %}

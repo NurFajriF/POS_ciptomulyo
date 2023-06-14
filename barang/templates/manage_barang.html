@@ -1,0 +1,87 @@
+<div class="container-fluid">
+    <form action="" id="barang-form">
+        <input type="hidden" name="id" value="{% if bar.pk %}{{bar.pk}}{% endif %}">
+        <div class="form-group mb-3">
+            <label for="code" class="control-label">Code</label>
+            <input type="text" name="code" id="code" class="form-control form-control-sm rounded-0" value="{% if bar.code %}{{bar.code}}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="kategori_id" class="control-label">Kategori</label>
+            <select name="kategori_id" id="kategori_id" class="form-select form-select-sm rounded-0" required>
+            {% if not bar.kategori_id %}
+            <option value="" disabled selected></option>
+            {% else %}
+            <option value="" disabled></option>
+            {% endif %}
+            {% for kat in kategori %}
+                {% if bar.kategori_id == kategori.id %}
+                <option value="{{ kat.id }}" selected>{{ kat.name }}</option>
+                {% else %}
+                <option value="{{ kat.id }}">{{ kat.name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+            <div class="form-group mb-3">
+                <label for="name" class="control-label">Nama Barang</label>
+                <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0" value="{% if bar.name %}{{bar.name}}{% endif %}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="merk" class="control-label">Merk</label>
+                <textarea rows="5" name="merk" id="merk" class="form-control form-control-sm rounded-0" required>{% if bar.merk %}{{bar.merk}}{% endif %}</textarea>
+            </div>
+            <div class="form-group mb-3">
+                <label for="price" class="control-label">Harga</label>
+                <input type="text" name="price" id="price" class="form-control form-control-sm rounded-0" value="{% if bar.price %}{{bar.price}}{% endif %}" required>
+            </div>
+    </form>
+    </div>
+    <script>
+        $(function() {
+            $('#barang-form').submit(function(e) {
+                e.preventDefault();
+                var _this = $(this)
+                $('.err-msg').remove();
+                var el = $('<div>')
+                el.addClass("alert alert-danger err-msg")
+                el.hide()
+                if (_this[0].checkValidity() == false) {
+                    _this[0].reportValidity();
+                    return false;
+                }
+                start_loader();
+                $.ajax({
+                    headers: {
+                        "X-CSRFToken": '{{csrf_token}}'
+                    },
+                    url: "{% url 'save-barang-page' %}",
+                    data: new FormData($(this)[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST',
+                    dataType: 'json',
+                    error: err => {
+                        console.log(err)
+                        end_loader();
+                    },
+                    success: function(resp) {
+                        if (typeof resp == 'object' && resp.status == 'success') {
+                            el.removeClass("alert alert-danger err-msg")
+                            location.reload()
+                        } else if (resp.status == 'failed' && !!resp.msg) {
+                            el.text(resp.msg)
+                        } else {
+                            el.text("An error occured", 'error');
+                            end_loader();
+                            console.err(resp)
+                        }
+                        _this.prepend(el)
+                        el.show('slow')
+                        $("html, body, .modal").scrollTop(0);
+                        end_loader()
+                    }
+                })
+            })
+        })
+    </script>
