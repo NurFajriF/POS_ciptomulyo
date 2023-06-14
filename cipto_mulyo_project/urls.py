@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.views.generic.base import RedirectView
 from login.views import login_user, logoutuser
+from django.views import defaults as default_views
 
 urlpatterns = [
     path('redirect-admin', RedirectView.as_view(url="/admin"),name="redirect-admin"),
@@ -35,3 +36,5 @@ urlpatterns = [
     path('penjualan/', include("penjualan.urls")),
     path('admin/', admin.site.urls, name="admin-site"),
 ]
+
+handler404 = default_views.page_not_found
