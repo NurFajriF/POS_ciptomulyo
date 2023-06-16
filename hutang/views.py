@@ -15,6 +15,7 @@ from datetime import date, datetime
 #Hutang
 @login_required
 def hutang(request):
+    '''function untuk mengambil data dari tabel hutang dan menampilkannya'''
     hut_list = Hutang.objects.all()
     context = {
         'page_title':'Daftar Hutang',
@@ -24,6 +25,7 @@ def hutang(request):
 
 @login_required
 def manage_hutang(request):
+    '''function untuk mengambil data dari tabel hutang berdasarkan id nya untuk diedit'''
     hutang = {}
     if request.method == 'GET':
         data =  request.GET
@@ -40,6 +42,7 @@ def manage_hutang(request):
 
 @login_required
 def save_hutang(request):
+    '''function untuk memasukkan data hutang yang baru dibuat ke tabel hutang'''
     data =  request.POST
     resp = {'status':'failed'}
     try:
@@ -56,6 +59,7 @@ def save_hutang(request):
 
 @login_required
 def delete_hutang(request):
+    '''function untuk menghapus data hutang berdasarkan id yang dipilih'''
     data =  request.POST
     resp = {'status':''}
     try:

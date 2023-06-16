@@ -12,6 +12,7 @@ from datetime import date, datetime
 
 # Login
 def login_user(request):
+    '''function untuk mengautentikasi login'''
     logout(request)
     resp = {"status":'failed','msg':''}
     username = ''

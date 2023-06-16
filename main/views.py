@@ -10,37 +10,42 @@ from django.shortcuts import redirect
 import json, sys
 from django.template import loader
 from datetime import date, datetime
+from barang.models import Barang
+from hutang.models import Hutang
+from kategori.models import Kategori
+from penjualan.models import Penjualan
 
 # Create your views here.
 
-# def main(request):
-#   template = loader.get_template('index.html')
-#   return HttpResponse(template.render())
 @login_required
 def main(request):
+    '''function untuk menampilkan report barang, kategori, transaksi, penjualan, dan penghutang harian'''
     now = datetime.now()
     current_year = now.strftime("%Y")
     current_month = now.strftime("%m")
     current_day = now.strftime("%d")
-    # categories = len(Category.objects.all())
-    # products = len(Products.objects.all())
-    # transaction = len(Sales.objects.filter(
-    #     date_added__year=current_year,
-    #     date_added__month = current_month,
-    #     date_added__day = current_day
-    # ))
-    # today_sales = Sales.objects.filter(
-    #     date_added__year=current_year,
-    #     date_added__month = current_month,
-    #     date_added__day = current_day
-    # ).all()
-    # total_sales = sum(today_sales.values_list('grand_total',flat=True))
+    kategori = len(Kategori.objects.all())
+    barang = len(Barang.objects.all())
+    transaksi = len(Penjualan.objects.filter(
+        date_added__year=current_year,
+        date_added__month = current_month,
+        date_added__day = current_day
+    ))
+    penjualan_hari_ini = Penjualan.objects.filter(
+        date_added__year=current_year,
+        date_added__month = current_month,
+        date_added__day = current_day
+    ).all()
+    total_penjualan = sum(penjualan_hari_ini.values_list('total',flat=True))
+
+    hutang = len(Hutang.objects.all())
     template = loader.get_template('index.html')
     context = {
         'page_title':'Home',
-        # 'categories' : categories,
-        # 'products' : products,
-        # 'transaction' : transaction,
-        # 'total_sales' : total_sales,
+        'kategori' : kategori,
+        'barang' : barang,
+        'transaksi' : transaksi,
+        'total_penjualan' : total_penjualan,
+        'hutang' : hutang
     }
     return render(request, 'index.html', context )

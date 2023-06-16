@@ -15,6 +15,7 @@ from datetime import date, datetime
 #Kategori
 @login_required
 def kategori(request):
+    '''function untuk mengambil data kategori dari tabel kategori dan menampilkan template kategori'''
     kat_list = Kategori.objects.all()
     context = {
         'page_title':'Daftar Kategori',
@@ -24,6 +25,7 @@ def kategori(request):
 
 @login_required
 def manage_kategori(request):
+    '''function untuk mengambil data kategori berdasarkan id yang dipilih untuk diedit '''
     kategori = {}
     if request.method == 'GET':
         data =  request.GET
@@ -40,6 +42,7 @@ def manage_kategori(request):
 
 @login_required
 def save_kategori(request):
+    '''function untuk memasukkan data kategori yang baru dibuat ke tabel kategori'''
     data =  request.POST
     resp = {'status':'failed'}
     try:
@@ -56,6 +59,7 @@ def save_kategori(request):
 
 @login_required
 def delete_kategori(request):
+    '''function untuk menghapus data kategori berdasarkan id yang dipilih'''
     data =  request.POST
     resp = {'status':''}
     try:

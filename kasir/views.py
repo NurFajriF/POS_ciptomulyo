@@ -16,6 +16,7 @@ from datetime import date, datetime
 # Create your views here.
 @login_required
 def kasir(request):
+    '''function untuk menampilkan template kasir dan data-data barang untuk dipilih dalam transaksi'''
     barang = Barang.objects.all()
     bar_json = []
     for bar in barang:
@@ -30,6 +31,7 @@ def kasir(request):
 
 @login_required
 def checkout_modal(request):
+    '''function untuk menampilkan template checkout dan menerima data total harga'''
     final_total = 0
     if 'final_total' in request.GET:
         final_total = request.GET['final_total']
@@ -40,6 +42,7 @@ def checkout_modal(request):
 
 @login_required
 def save_kasir(request):
+    '''function untuk memasukkan data transaksi yang dibuat ke tabel penjualan'''
     resp = {'status':'failed','msg':''}
     data = request.POST
     pref = datetime.now().year + datetime.now().year
@@ -76,6 +79,7 @@ def save_kasir(request):
 
 @login_required
 def receipt(request):
+    '''function untuk mengambil data penjualan berdasarkan id nya dan menampilkan receipt-nya'''
     id = request.GET.get('id')
     penjualan = Penjualan.objects.filter(id = id).first()
     transaksi = {}

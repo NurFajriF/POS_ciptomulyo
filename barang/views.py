@@ -15,6 +15,7 @@ from datetime import date, datetime
 # Barang
 @login_required
 def barang(request):
+    '''function untuk mengambil data barang dari tabel barang dan menampilkannya'''
     bar_list = Barang.objects.all()
     context = {
         'page_title':'Daftar Barang',
@@ -24,6 +25,7 @@ def barang(request):
 
 @login_required
 def manage_barang(request):
+    '''function untuk mengambil data barang dari tabel berdasarkan id nya untuk diedit'''
     bar = {}
     kategori = Kategori.objects.all()
     if request.method == 'GET':
@@ -42,6 +44,7 @@ def manage_barang(request):
 
 @login_required
 def save_barang(request):
+    '''function untuk memasukkan data barang yang dibuat ke tabel barang'''
     data =  request.POST
     resp = {'status':'failed'}
     id= ''
@@ -69,6 +72,7 @@ def save_barang(request):
 
 @login_required
 def delete_barang(request):
+    '''function untuk menghapus data barang berdasarkan id yang dipilih'''
     data =  request.POST
     resp = {'status':''}
     try:

@@ -16,6 +16,7 @@ from datetime import date, datetime
 
 @login_required
 def daftarPenjualan(request):
+    '''function untuk mengambil data penjualan dari tabel penjualan dan menampilkannya pada template penjualan'''
     penjualan = Penjualan.objects.all()
     penjualan_data = []
     for jual in penjualan:
@@ -36,6 +37,7 @@ def daftarPenjualan(request):
 
 @login_required
 def receipt(request):
+    '''function untuk mengambil data penjualan berdasarkan id yang dipilih dan menampilkannya pada template receipt'''
     id = request.GET.get('id')
     penjualan = Penjualan.objects.filter(id = id).first()
     transaksi = {}
@@ -52,6 +54,7 @@ def receipt(request):
 
 @login_required
 def delete_penjualan(request):
+    '''function untuk menghapus data penjualan berdasarkan id yang dipilih'''
     resp = {'status':'failed', 'msg':''}
     id = request.POST.get('id')
     try:
